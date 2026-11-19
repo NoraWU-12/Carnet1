@@ -361,15 +361,7 @@
           <option value="pron.">代词 (pron.)</option>
           <option value="其他">其他</option>
         </select></div>
-      <div class="fld" id="lvlField" style="display:none"><label>语言等级</label>
-        <select id="inLevel">
-          <option value="B1">B1</option>
-          <option value="B2" selected>B2</option>
-          <option value="C1">C1</option>
-          <option value="C2">C2</option>
-        </select></div>
     </div>
-    <div class="hint" id="lvlHint" style="display:none;font-size:12px;color:var(--brand);margin:-2px 0 8px"></div>
 
     <div class="section-title" id="senseTitle">中文释义（可多条；每条可加例句，并可批注）</div>
     <div id="senseList"></div>
@@ -405,13 +397,6 @@
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
       <input id="search" placeholder="搜索法语、中文释义或备注…" autocomplete="off">
     </div>
-    <select class="sortsel" id="lvFilter" title="按等级筛选" style="display:none">
-      <option value="all">全部等级</option>
-      <option value="B1">B1</option>
-      <option value="B2">B2</option>
-      <option value="C1">C1</option>
-      <option value="C2">C2</option>
-    </select>
     <select class="sortsel" id="sortSel">
       <option value="new">最近添加</option>
       <option value="old">最早添加</option>
@@ -507,16 +492,6 @@
             <label style="display:flex;align-items:center;gap:8px;font-weight:400;margin-top:6px">
               <input type="checkbox" id="nListen" style="width:18px;height:18px;accent-color:var(--brand)"> <span>是，这是精听内容 🎧</span></label></div>
         </div>
-        <div class="row" style="margin-top:10px">
-          <div class="fld" style="max-width:160px"><label>内容类型</label>
-            <select id="nType">
-              <option value="文章" selected>📄 文章</option>
-              <option value="视频">🎬 视频</option>
-              <option value="博客">✍️ 博客</option>
-            </select></div>
-          <div class="fld" id="nDurField" style="max-width:180px;display:none"><label>时长（如 12:30 / 45分钟）</label>
-            <input type="text" id="nDur" placeholder="如 12:30" autocomplete="off"></div>
-        </div>
         <div class="section-title" id="branchTitle">分支（自己起名，如 名人名言 / 社会新闻 / 时尚史）</div>
         <div id="branchList"></div>
         <button class="btn sm" id="addBranch">＋ 添加一个分支</button>
@@ -533,12 +508,11 @@
     <div class="hero"><h1>数据统计</h1><span id="statsRangeLabel"></span></div>
 
     <section class="card">
-      <div class="section-title">📅 今日词汇</div>
+      <div class="section-title">📅 今日录入总结</div>
       <div id="todaySummary" class="today-box"></div>
       <div class="actions" style="margin-top:10px">
-        <button class="btn sm" id="exportToday">⬇ 导出今日词汇（TXT）</button>
-        <button class="btn sm" id="exportTodayMd">⬇ 导出今日词汇（MD）</button>
-        <button class="btn sm" id="exportTodayCsv">⬇ 导出今日词汇（CSV）</button>
+        <button class="btn sm" id="exportToday">⬇ 导出今日总结（TXT）</button>
+        <button class="btn sm" id="exportTodayMd">⬇ 导出今日总结（MD）</button>
       </div>
     </section>
 
@@ -641,13 +615,6 @@
           <option value="conj.">连词 (conj.)</option>
           <option value="pron.">代词 (pron.)</option>
           <option value="其他">其他</option>
-        </select></div>
-      <div class="fld" style="display:none"><label>语言等级</label>
-        <select id="eLevel">
-          <option value="B1">B1</option>
-          <option value="B2">B2</option>
-          <option value="C1">C1</option>
-          <option value="C2">C2</option>
         </select></div></div>
     <div class="section-title">中文释义与例句（可批注：B 加粗 / H 高亮 / 玫红）</div>
     <div id="eSenseList"></div>
@@ -695,45 +662,9 @@ function dropTopic(t){state.topics=state.topics.filter(x=>x!==t);}
 const blankSense=()=>({zh:"",eg:"",b:false,h:false,c:false});
 state.notes=state.notes||[];
 const LEVELS=['B1','B2','C1','C2'];
-/* ---------- 法语等级自动识别（内置词库 + 规则兜底，结果为“建议等级”，可手动改） ---------- */
-const LV_WORDS={
-  B1:`apprendre aimer arriver essayer chercher devenir devoir dormir entendre envoyer écrire espérer habiter indiquer laisser mener montrer obtenir paraître permettre poser pourvoir prendre produire recevoir recommander remplir rendre répondre satisfaire sentir servir sortir suffire suivre tenir trouver vivre connaître croire devoir faire falloir pouvoir savoir vouloir venir voir dire demander parler écouter regarder comprendre continuer commencer finir choisir réfléchir agir remplacer partager organiser présenter proposer signaler téléphoner voyager visiter réserver commander goûter préparer nettoyer ranger porter mettre jeter laver lever couvrir construire détruire augmenter diminuer doubler tripler gagner perdre payer coûter valoir peser mesurer marquer noter corriger expliquer préciser raconter décrire discuter débattre décider conclure admettre reconnaître oublier rappeler retrouver rejoindre attendre espérer craindre éviter risquer essayer tenter`,
-  B2:`analyser anticiper apparaître appartenir approuver assumer atteindre attribuer bénéficier caractériser coexister commenter compromettre concevoir conclure confirmer confronter consacrer conserver considérer constituer contester contribuer convenir coopérer décrypter déduire défendre définir démontrer dénoncer dépenser déterminer développer diffuser discriminer disposer dissocier dominer échanger éliminer élaborer émettre emporter engager enrichir entretenir environ évaluer évoquer exclure expérimenter exploiter exposer exprimer extraire faciliter figurer fixer favoriser générer garantir gérer identifier ignorer impliquer imposer impulser inclure influencer informer initier inscrire installer interconnecter interpréter intervenir investir justifier limiter maintenir manipuler mobiliser modifier multiplier neutraliser observer obtenir optimiser orienter participer percevoir percer performer persuader prouver publier quadrupler qualifier ramener rationaliser réaliser réagir recenser reconstituer recruter réduire référer refléter réformer refinancer régler relever repérer représenter reproduire requérir résoudre respecter restaurer restructurer rétablir retenir révéler sacrifier satisfaire saisir souligner surmonter suspendre symboliser taxer télétravailler tendre transformer transmettre travailler vérifier vulgariser`,
-  C1:`abandonner abroger affranchir aggraver alléguer amalgamer ambiguïté angoisse anticonstitutionnel apatridie âpreté arbitrage arguer asymétrie atrocité audacieux austérité avantagiste béatitude bigarrure bienfacture biopsie cacophonie camouflage capricieux circonstancier climatique coercitif cognitif cohésion collusion commémorer compassion compétence complainte complexité compréhension concaténer condescendance confiner conjecturer consensus consanguin conspuer constellation consulter contingence controverse convergence convocation copieux corollaire corpulent crépusculaire crédibilité culpabilité cynisme déambuler décadence déceler déchéance décrépitude défaillance défiance délibérer déloyauté démarche démocratie démographie dénaturer dénuement déontologie dépasser déplorer dépouille dérive désabusé désaveu descendre désespoir désobliger dessaisir détérioration détonation dévouement diaphane dichotomie dilapider dissonance divergent divulguer dogmatique doléance domestiquer dominer dramatiser dubitatif duplicité ébranler écarteler échéance éclater écœurer effarer effervescence effigie élan éloquent émaner émanciper embargo embrigader émergence éminent empathie empirisme endiguer endosser énième enjeu envergure épancher éphémère épineux épilogue épitaphe équité ergonomie ériger erratique escalader esquisse essoufflement esthétique ethnie étymologie euphémisme évanescent éventualité éviction exacerber exaucer exégèse exhorter exonérer exorbitant expédient expiation explicite expurger exsangue exténuer extravagant exulter fardeau farfelu fastidieux fébrile fécond flagrant fléau flou florissant fluctuer foisonner forcené forfaiture formuler fourvoyer fracturer frayer frénésie frivole fugace fulgurance fumisterie fusionner galvauder garantie gênant généreux gesticuler ghetto gnose graduel gratuit gregaire griffure grogner gui hâbler hagard haletant happens harangue hasardeux haussier héberger hérésie hermétique hétéroclite hiatus hiérarchie hobereau homogène honteux hors-d'œuvre hydre hypocrisie idiosyncrasie ignoble illicite illusoire immuable impacter impair impasse impromptu imputer inadéquat inaliénable inconstant incrédulité indécent indexer indicible indigent indiscipline indolence inexorable inflexion infraction ingérence inhérent inique initier injecter innocence inopiné insalubre insidieux insouciant instiguer insulaire insurrection intarissable intégrité intercession intersaisons intime intraitable intrigue intrinsèque ubiquitaires ubuesque ultime unanime usurper vacarme vacciner vaciller vagabond verbeux vernaculaire véridique vertige vexatoire vicissitude vigilance viles villégiature virage virtuose viscosité volatil vorace voyou vulgaire`,
-  C2:`impénitence incommensurable inextricable insondable obscurantisme onirique opprobre ossature palimpseste panégyrique paradigme paroxysme pathos péremptoire péripétie phalange philatélie pléthore poindre polémiquer polyvalence postuler précarité prédilection prééminence prérogative procrastination prosélytisme pulluler quasiment quiddité quiétude racoler railler rancœur rébus récalcitrant récipiendaire récuser redondance réfractaire régalien relent remontrance rémunération rétrocéder revendication rhétorique rigueur sacrifice sagace salubre sanctuaire sarcasme saturer schisme scotomisation séculaire sémantique septique séquelle serein signalétique sinistre soporifique sordide statufier stupéfaction subordonner subtil succinct suppuration sûreté sursis symbolique syncope syntagme tablature tachygraphe tartufferie ténèbres théâtralité thuriféraire tympan ubiquité ulcéreronctuosité usance vacuité valeureux velléité véniel véracité vernis versatilitévindicatif virulent voeu vulnérable zapper zèle zéphyr zodiacal zoolâtrie zugzwang`
-};
-const B1_BASIC="ordinateur organisation gouvernement université région problème exemple résultat situation économie société politique culture histoire santé famille travail école étudiant professeur maison appartement ville pays europe france paris monde temps année jour semaine matin soir moment personne homme femme enfant ami vie argent prix magasin restaurant hôtel train avion voiture bus billet gare aéroport menu plat viande poisson légume fruit fromage pain café thé vin eau lait sucre sel serviette chaussure vêtement chemise robe manteau chapeau sac téléphone internet site page livre journal film musique sport match équipe jeu piscine plage montagne mer rivière jardin animal chien chat oiseau fleur arbre soleil pluie neige vent froid chaud beau mauvais grand petit long court jeune vieux nouveau ancien facile difficile important intéressant content triste malade fatigué rapide lent cher bon meilleur pire même autre téléphoner voyager visiter réserver commander goûter préparer nettoyer ranger construire augmenter diminuer gagner perdre payer mesurer expliquer raconter décrire discuter décider oublier retrouver attendre";
-const LV_MAP=(()=>{const m={};Object.keys(LV_WORDS).forEach(lv=>LV_WORDS[lv].split(/\s+/).forEach(w=>{if(w&&!m[w])m[w]=lv;}));return m;})();
-const LV_SUFFIX=[[/(ologie|graphie|phobie|cratie|tique|isme|iste|ité|eur|euse|ment|tion|sion|ance|ence|oire|esque|âtre|âpreté)$/i,1],
-  [/(tion|sion)$/i,0],[/^[^aeiouàâéèêëïîôùûç]{4,}$/i,1]];
-function guessLevel(fr){
-  const raw=(fr||'').trim();if(!raw)return null;
-  const w=raw.toLowerCase().replace(/^[^a-zàâäéèêëïîôöùûüçœæ]+/i,'').replace(/[.,;:!?…«»""''()\[\]]/g,'').trim();
-  if(!w)return null;
-  if(LV_MAP[w])return {level:LV_MAP[w],why:'内置词库'};
-  const base=w.replace(/(e|es|ent|er|é|ée|és|ées|s|x)$/i,'')||w;
-  if(LV_MAP[base])return {level:LV_MAP[base],why:'内置词库'};
-  let r=1;
-  const letters=(w.match(/[a-zàâäéèêëïîôöùûüçœæ]/gi)||[]).length;
-  const basic=B1_BASIC.split(/\s+/);
-  if(basic.includes(w)||basic.includes(base))return {level:'B1',why:'常用基础词'};
-  const parts=w.split(/\s+/).filter(Boolean);
-  if(parts.length>1){
-    const subs=parts.map(p=>guessLevel(p)).filter(x=>x);
-    const rank=l=>LEVELS.indexOf(l.level);
-    const top=subs.reduce((a,b)=>rank(b)>rank(a)?b:a);
-    return {level:LEVELS[Math.min(3,rank(top)+(parts.length>=4?1:0))],why:'按表达中主要词推断'};
-  }
-  letters<=7?r=0:letters<=9?r=1:letters<=11?r=2:r=3;
-  let bumped=false;
-  for(const [re,d] of LV_SUFFIX){if(re.test(w)){r+=d;if(d)bumped=true;break;}}
-  const idx=Math.max(0,Math.min(3,r));
-  return {level:LEVELS[idx],why:bumped?'词形特征推断':'按长度与构词推断'};
-}
 function newNote(){return {id:'n'+Date.now()+Math.random().toString(36).slice(2,6),ts:Date.now(),
-  title:'',level:'B2',src:'',listen:false,ntype:'文章',duration:'',branches:[{id:'b0',name:'摘录',content:''}]};}
+  title:'',level:'B2',src:'',listen:false,branches:[{id:'b0',name:'摘录',content:''}]};}
 function noteStat(n){let c=0,k=0;(n.branches||[]).forEach(b=>{k+=(b.content||'').length;if((b.content||'').trim())c++;});return {c,k};}
-function toggleDurField(){const t=document.getElementById('nType');const f=document.getElementById('nDurField');if(t&&f)f.style.display=(t.value==='视频'||t.value==='博客')?'':'none';}
 
 /* ---------- 推荐主题 ---------- */
 function recommend(fr){
@@ -846,8 +777,6 @@ function setAddMode(m){
   document.getElementById('frLabel').textContent=expr?'表达组名称（选填，用于概括这一组）':'法语单词 / 词组';
   inFr.placeholder=expr?'如 三大产业（可留空，直接在下方逐条录入）':'如 rendez-vous';
   document.getElementById('posField').style.display=expr?'none':'';
-  document.getElementById('lvlField').style.display='none';
-  updateLevelGuess();
   document.getElementById('senseTitle').textContent=expr?'对照表达（一行一条，可在同一组内对比）':'中文释义（可多条；每条可加例句，并可批注）';
   document.getElementById('addSense').textContent=expr?'＋ 添加一条表达（换一行）':'＋ 添加一条释义';
   document.getElementById('addBtn').textContent=expr?'加入表达':'加入生词本';
@@ -893,18 +822,7 @@ function renderRecos(){
       document.getElementById('chosenTag').textContent='已选主题：🏷️ '+n;renderChips();renderRecos();});
   }
 }
-inFr.oninput=()=>{renderRecos();updateLevelGuess();};
-function updateLevelGuess(){
-  return; /* 词汇分级功能已停用 */
-  const hint=document.getElementById('lvlHint');
-  if(addMode==='expr'){hint.style.display='none';return;}
-  const g=guessLevel(inFr.value);
-  if(!g){hint.style.display='none';return;}
-  const sel=document.getElementById('inLevel');
-  sel.value=g.level;
-  hint.style.display='block';
-  hint.textContent=`✨ 已自动识别为 ${g.level}（${g.why}），可在右侧手动修改`;
-}
+inFr.oninput=renderRecos;
 
 document.getElementById('addBtn').onclick=()=>{
   if(addMode==='expr')return addExpr();
@@ -926,7 +844,7 @@ function addExpr(){
   ensureTopic(chosenTopic);
   const title=group||(rows[0].fr||rows[0].zh||'表达');
   state.words.unshift({id:"e"+Date.now(),type:'expr',fr:title,group:group,senses:rows,
-    note:inNote.value.trim(),topic:chosenTopic,ts:Date.now(),level:document.getElementById('inLevel').value});
+    note:inNote.value.trim(),topic:chosenTopic,ts:Date.now()});
   save();resetAdd();render();
 }
 function resetAdd(){inFr.value='';inPos.value='';inNote.value='';chosenTopic=null;
@@ -1026,8 +944,6 @@ function renderGrid(){
   let list=state.words.filter(w=>{
     if(curTopic!=='all'&&w.topic!==curTopic)return false;
     if(curType!=='all'&&(w.type||'word')!==curType)return false;
-    const lvF=(document.getElementById('lvFilter')||{}).value||'all';
-    if(lvF!=='all'&&(w.level||'B2')!==lvF)return false;
     if(q){const hay=(w.fr+' '+(w.senses||[]).map(s=>(s.fr||'')+' '+s.zh+' '+s.eg).join(' ')+' '+(w.note||'')).toLowerCase();
       if(!hay.includes(q))return false;}
     return true;});
@@ -1240,10 +1156,6 @@ function openNoteEditor(n){
   document.getElementById('nLevel').value=notesEditing.level||'B2';
   document.getElementById('nSrc').value=notesEditing.src||'';
   document.getElementById('nListen').checked=!!notesEditing.listen;
-  document.getElementById('nType').value=notesEditing.ntype||'文章';
-  document.getElementById('nDurField')&&(document.getElementById('nDurField').style.display=(notesEditing.ntype==='视频'||notesEditing.ntype==='博客')?'':'none');
-  document.getElementById('nDur').value=notesEditing.duration||'';
-  toggleDurField();
   renderBranches();noteStatLive();
   document.getElementById('noteListView').style.display='none';
   document.getElementById('noteEditView').style.display='block';
@@ -1277,7 +1189,6 @@ function renderNotes(){
     return `<div class="ncard" data-id="${n.id}">
       <div class="ntop"><span class="ntitle" data-op="open">${esc(n.title)||'（未命名）'}</span>
         <span class="lv ${n.listen?'listen':''}">${esc(n.level||'B2')}${n.listen?' · 精听':''}</span></div>
-      <div class="nsrc" style="color:var(--muted)">${{视频:'🎬 视频',博客:'✍️ 博客',文章:'📄 文章'}[n.ntype||'文章']||'📄 文章'}${n.duration?` · ⏱ ${esc(n.duration)}`:''}</div>
       ${n.src?`<div class="nsrc">来源：${esc(n.src)}</div>`:''}
       ${bs}
       <div style="font-size:11px;color:var(--muted);margin-top:8px">${s.c} 个分支 · ${s.k} 字 · ${new Date(n.ts||Date.now()).toLocaleDateString('zh-CN')}</div>
@@ -1297,15 +1208,12 @@ document.getElementById('noteNew').onclick=()=>openNoteEditor(null);
 document.getElementById('backNotes').onclick=()=>showNoteList();
 document.getElementById('noteCancel').onclick=()=>showNoteList();
 document.getElementById('addBranch').onclick=()=>{if(notesEditing){notesEditing.branches.push({id:'b'+Date.now(),name:'',content:''});renderBranches();}};
-document.getElementById('nType').onchange=toggleDurField;
 document.getElementById('noteSave').onclick=()=>{
   const n=notesEditing;if(!n)return;
   n.title=document.getElementById('nTitle').value.trim();
   n.level=document.getElementById('nLevel').value;
   n.src=document.getElementById('nSrc').value.trim();
   n.listen=document.getElementById('nListen').checked;
-  n.ntype=document.getElementById('nType').value;
-  n.duration=document.getElementById('nDur').value.trim();
   n.branches=n.branches.map(b=>({id:b.id,name:(b.name||'').trim()||(b.content||'').slice(0,12)||'摘录',content:(b.content||'').trim()}))
     .filter(b=>b.name||b.content);
   if(!n.branches.length)n.branches=[{id:'b'+Date.now(),name:'摘录',content:''}];
@@ -1333,7 +1241,6 @@ function openEdit(id){
   document.getElementById('eFr').value=(editType==='expr'&&w.group)?w.group:w.fr;
   document.getElementById('ePos').value=w.pos||'';
   document.getElementById('eNote').value=w.note||'';
-  document.getElementById('eLevel').value=w.level||'B2';
   const blank=editType==='expr'?blankExpr:blankSense;
   editSenses=(w.senses&&w.senses.length)?w.senses.map(s=>({...s})):[blank()];
   editTopic=w.topic;
@@ -1367,14 +1274,13 @@ document.getElementById('eSave').onclick=()=>{
     if(!rows.length){toast('请至少保留一条表达');return;}
     w.group=fr;w.type='expr';
     w.fr=fr||(rows[0].fr||rows[0].zh||'表达');
-    w.senses=rows;w.pos='';w.level=document.getElementById('eLevel').value;
+    w.senses=rows;w.pos='';
   }else{
     if(!fr){toast('单词不能为空');return;}
     w.type='word';w.fr=fr;w.pos=document.getElementById('ePos').value;
     w.senses=editSenses.filter(s=>s.zh.trim()||s.eg.trim()).map(s=>({...s,zh:s.zh.trim(),eg:s.eg.trim()}));
   }
   w.note=document.getElementById('eNote').value.trim();w.topic=editTopic;
-  w.level=document.getElementById('eLevel').value;
   save();mask.classList.remove('show');render();
 };
 mask.onclick=e=>{if(e.target===mask)mask.classList.remove('show');};
@@ -1417,36 +1323,6 @@ function buildTodayText(fmt){
     });
   }
   if(!words.length&&!notes.length)L.push(fmt==='md'?'> 今天还没有录入任何内容。':'(今天还没有录入任何内容。)');
-  return L.join('\n');
-}
-function buildTodayWords(fmt){
-  const words=state.words.filter(w=>isToday(w.ts)).sort((a,b)=>(a.ts||0)-(b.ts||0));
-  const L=[];const d=new Date();const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  if(fmt==='csv'){
-    L.push('类型,法语/表达,词性,中文释义,例句,主题,备注');
-    words.forEach(w=>{
-      (w.senses&&w.senses.length?w.senses:[{zh:'',eg:''}]).forEach((s,idx)=>{
-        const zh=(w.type==='expr'?((s.fr?('· '+s.fr+' → '):'')+(s.zh||'')):(s.zh||''));
-        L.push([w.type==='expr'?'表达':'生词',w.fr||'',w.pos||'',zh,s.eg||'',w.topic||'',w.note||''].map(csvCell).join(','));
-      });
-    });
-    return L.join('\n');
-  }
-  if(fmt==='md'){L.push(`# 今日词汇 · ${ds}`,'');}else{L.push(`今日词汇  ${ds}`,'='.repeat(20),'');}
-  L.push(`共 ${words.length} 条`,'');
-  if(words.length){
-    words.forEach((w,i)=>{
-      const head=(w.type==='expr'?'💬 ':'')+`${i+1}. ${w.fr||''}`+(w.pos?` （${w.pos}）`:'')+`  〔${w.topic||'未分类'}〕`;
-      L.push(fmt==='md'?`### ${head}`:head);
-      (w.senses||[]).forEach((s,j)=>{
-        if(w.type==='expr')L.push(`  - ${s.fr||''} → ${s.zh||''}`+(s.b?'（重点）':''));
-        else L.push(`  ${j+1}. ${s.zh||''}`+(s.b?'（重点）':''));
-        if(s.eg)L.push(`     例：${s.eg}`);
-      });
-      if(w.note)L.push(`  📝 备注：${w.note}`);
-      L.push('');
-    });
-  }else{L.push(fmt==='md'?'> 今天还没有录入词汇。':'(今天还没有录入词汇。)');}
   return L.join('\n');
 }
 function renderStats(){
@@ -1500,9 +1376,8 @@ function downloadText(filename,content,type){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1500);
 }
-document.getElementById('exportToday').onclick=()=>{downloadText(`今日词汇_${new Date().toISOString().slice(0,10)}.txt`,buildTodayWords('txt'));toast('今日词汇已导出（TXT）');};
-document.getElementById('exportTodayCsv').onclick=()=>{downloadText(`今日词汇_${new Date().toISOString().slice(0,10)}.csv`,'\ufeff'+buildTodayWords('csv'),'text/csv;charset=utf-8');toast('今日词汇已导出（CSV）');};
-document.getElementById('exportTodayMd').onclick=()=>{downloadText(`今日词汇_${new Date().toISOString().slice(0,10)}.md`,buildTodayWords('md'),'text/markdown;charset=utf-8');toast('今日词汇已导出（MD）');};
+document.getElementById('exportToday').onclick=()=>{downloadText(`今日总结_${new Date().toISOString().slice(0,10)}.txt`,buildTodayText('txt'));toast('今日总结已导出（TXT）');};
+document.getElementById('exportTodayMd').onclick=()=>{downloadText(`今日总结_${new Date().toISOString().slice(0,10)}.md`,buildTodayText('md'),'text/markdown;charset=utf-8');toast('今日总结已导出（MD）');};
 document.getElementById('exportAll').onclick=()=>{
   const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carnet_法语生词本.json';a.click();};
@@ -1532,7 +1407,6 @@ document.getElementById('exportCsv').onclick=()=>{
 /* ---------- 导入导出 / 工具条 ---------- */
 document.getElementById('search').oninput=e=>{curQuery=e.target.value;renderGrid();};
 document.getElementById('sortSel').onchange=e=>{curSort=e.target.value;renderGrid();};
-document.getElementById('lvFilter').onchange=()=>renderGrid();
 document.querySelectorAll('#typeSel button').forEach(b=>{
   b.onclick=()=>{curType=b.dataset.type;
     document.querySelectorAll('#typeSel button').forEach(x=>x.classList.toggle('on',x===b));
