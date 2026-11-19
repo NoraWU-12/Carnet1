@@ -176,6 +176,29 @@
   .page{display:none}
   .page.on{display:block}
 
+  /* 录入子页签（生词/表达） */
+  .subtabs{display:flex;gap:6px;background:var(--brand-soft);padding:4px;border-radius:99px;margin:0 0 14px}
+  .subtab{flex:1;border:none;background:transparent;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--muted);
+    padding:8px 12px;border-radius:99px;cursor:pointer;transition:.18s}
+  .subtab.on{background:var(--card);color:var(--brand);box-shadow:var(--shadow)}
+  /* 表达对照行 */
+  .erow{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start;margin-bottom:8px}
+  .erow .fr-input,.erow .zh-input{width:100%}
+  .erow .prow{margin-bottom:6px}
+  @media(max-width:560px){.erow{grid-template-columns:1fr}}
+  /* 类型筛选 */
+  .typesel{display:inline-flex;gap:4px;background:var(--brand-soft);padding:3px;border-radius:99px}
+  .typesel button{border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);
+    padding:5px 12px;border-radius:99px;cursor:pointer;transition:.18s}
+  .typesel button.on{background:var(--card);color:var(--brand);box-shadow:var(--shadow)}
+  /* 表达卡片 */
+  .exprcard .erow-list{border-top:1px dashed var(--line);margin-top:6px;padding-top:6px}
+  .exprcard .eline{display:flex;gap:8px;padding:4px 0;align-items:baseline;flex-wrap:wrap}
+  .exprcard .enum{color:var(--brand);font-weight:700;font-size:12px;min-width:16px}
+  .exprcard .efr{font-weight:600;color:var(--ink)}
+  .exprcard .earrow{color:var(--muted);font-size:12px}
+  .expr-group-title{font-weight:700;color:var(--brand);margin-bottom:4px}
+
   /* 笔记本视图 */
   .bookbar{display:flex;gap:10px;align-items:center;margin:0 0 14px;flex-wrap:wrap}
   .bookbar .search{flex:1;min-width:180px}
@@ -266,10 +289,14 @@
 
   <!-- 添加区 -->
   <section class="adder">
-    <div class="row">
-      <div class="fld" style="flex:2"><label>法语单词 / 词组</label>
+    <div class="subtabs">
+      <button class="subtab on" data-mode="word">📝 生词</button>
+      <button class="subtab" data-mode="expr">💬 表达</button>
+    </div>
+    <div class="row" id="frRow">
+      <div class="fld" style="flex:2"><label id="frLabel">法语单词 / 词组</label>
         <input type="text" id="inFr" placeholder="如 rendez-vous" autocomplete="off"></div>
-      <div class="fld"><label>词性</label>
+      <div class="fld" id="posField"><label>词性</label>
         <select id="inPos">
           <option value="">未指定</option>
           <option value="n.m.">名词 · 阳性 (n.m.)</option>
@@ -287,7 +314,7 @@
         </select></div>
     </div>
 
-    <div class="section-title">中文释义（可多条；每条可加例句，并可批注）</div>
+    <div class="section-title" id="senseTitle">中文释义（可多条；每条可加例句，并可批注）</div>
     <div id="senseList"></div>
     <button class="btn sm" id="addSense">＋ 添加一条释义</button>
 
@@ -312,6 +339,11 @@
 
   <!-- 查阅区 -->
   <div class="toolbar">
+    <div class="typesel" id="typeSel">
+      <button data-type="all" class="on">全部</button>
+      <button data-type="word">📝 生词</button>
+      <button data-type="expr">💬 表达</button>
+    </div>
     <div class="search">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
       <input id="search" placeholder="搜索法语、中文释义或备注…" autocomplete="off">
@@ -426,8 +458,11 @@ const KEYWORDS={
 
 const KEY="carnet_fr_v2";
 let state=load();
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.words)return s;}catch(e){}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.words){migrate(s);return s;}}catch(e){}
   return {words:[],topics:[...DEFAULT_TOPICS]};}
+function migrate(s){s.topics=s.topics||[...DEFAULT_TOPICS];s.order=s.order||{};
+  s.words.forEach(w=>{if(!w.type)w.type='word';
+    if(w.type==='expr'&&w.senses)w.senses.forEach(sn=>{if(sn.fr===undefined)sn.fr='';});});}
 let saveTimer=null;
 function save(){clearTimeout(saveTimer);
   saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(state));flashSaved();}
@@ -489,12 +524,75 @@ function renderSenseList(container,list){
 }
 
 /* ---------- 添加区 ---------- */
-let draftSenses=[blankSense()], chosenTopic=null;
+let draftSenses=[blankSense()], chosenTopic=null, addMode='word';
 const senseListEl=document.getElementById('senseList');
-function renderAddSenses(){renderSenseList(senseListEl,draftSenses);
-  draftSenses._render=()=>{renderAddSenses();};bindSenseList(senseListEl,()=>draftSenses);}
-document.getElementById('addSense').onclick=()=>{draftSenses.push(blankSense());renderAddSenses();};
+const blankExpr=()=>({fr:"",zh:"",eg:"",b:false,h:false,c:false});
+
+/* 表达对照行：法语 + 中文 + 例句，各自独立 */
+function exprRow(s){
+  return `<div class="pair erow-wrap" data-i="__">
+    <div class="erow">
+      <input type="text" class="e-fr fr-input" placeholder="法语表达（如 secteur primaire）" value="${esc(s.fr)}">
+      <input type="text" class="s-zh zh-input" placeholder="对应中文（如 第一产业）" value="${esc(s.zh)}">
+    </div>
+    <div class="prow">
+      <input type="text" class="s-eg" placeholder="例句（选填）" value="${esc(s.eg)}" style="width:100%;flex:1">
+      <div class="fbtns">
+        <button class="fbtn b ${s.b?'on':''}" data-f="b" title="加粗">B</button>
+        <button class="fbtn h ${s.h?'on':''}" data-f="h" title="高亮">H</button>
+        <button class="fbtn c ${s.c?'on':''}" data-f="c" title="玫红色">A</button>
+        <button class="fbtn" data-f="del" title="删除">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+function renderExprList(container,list){
+  container.innerHTML=list.map((s,i)=>exprRow(s).replace(/data-i="__"/,`data-i="${i}"`)).join('')||
+    `<div style="font-size:12px;color:var(--muted)">暂无表达，点下方添加一行</div>`;
+  if(!list.length)container.dataset.empty="1";else delete container.dataset.empty;
+}
+function bindExprList(container,getList){
+  container.querySelectorAll('.pair').forEach(p=>{
+    const i=+p.dataset.i; const list=getList();
+    if(!list[i])return;
+    const fe=p.querySelector('.e-fr'); if(fe)fe.oninput=e=>list[i].fr=e.target.value;
+    const ze=p.querySelector('.s-zh'); if(ze)ze.oninput=e=>list[i].zh=e.target.value;
+    const ee=p.querySelector('.s-eg'); if(ee)ee.oninput=e=>list[i].eg=e.target.value;
+    p.querySelectorAll('.fbtn').forEach(fb=>{
+      fb.onclick=()=>{const f=fb.dataset.f;
+        if(f==='del'){list.splice(i,1);}else{list[i][f]=!list[i][f];}
+        getList._render();};
+    });
+  });
+}
+
+function renderAddSenses(){
+  if(addMode==='expr'){
+    renderExprList(senseListEl,draftSenses);
+    draftSenses._render=()=>{renderAddSenses();};bindExprList(senseListEl,()=>draftSenses);
+  }else{
+    renderSenseList(senseListEl,draftSenses);
+    draftSenses._render=()=>{renderAddSenses();};bindSenseList(senseListEl,()=>draftSenses);
+  }
+}
+document.getElementById('addSense').onclick=()=>{draftSenses.push(addMode==='expr'?blankExpr():blankSense());renderAddSenses();};
 const inFr=document.getElementById('inFr'), inPos=document.getElementById('inPos'), inNote=document.getElementById('inNote');
+
+/* 切换 生词 / 表达 录入模式 */
+function setAddMode(m){
+  addMode=m;
+  document.querySelectorAll('.subtab').forEach(x=>x.classList.toggle('on',x.dataset.mode===m));
+  const expr=m==='expr';
+  document.getElementById('frLabel').textContent=expr?'表达组名称（选填，用于概括这一组）':'法语单词 / 词组';
+  inFr.placeholder=expr?'如 三大产业（可留空，直接在下方逐条录入）':'如 rendez-vous';
+  document.getElementById('posField').style.display=expr?'none':'';
+  document.getElementById('senseTitle').textContent=expr?'对照表达（一行一条，可在同一组内对比）':'中文释义（可多条；每条可加例句，并可批注）';
+  document.getElementById('addSense').textContent=expr?'＋ 添加一条表达（换一行）':'＋ 添加一条释义';
+  document.getElementById('addBtn').textContent=expr?'加入表达':'加入生词本';
+  draftSenses=[expr?blankExpr():blankSense()];
+  renderAddSenses();
+}
+document.querySelectorAll('.subtab').forEach(sb=>sb.onclick=()=>setAddMode(sb.dataset.mode));
 
 function startCreate(wrap,onDone){
   if(wrap.querySelector('input'))return;
@@ -536,17 +634,30 @@ function renderRecos(){
 inFr.oninput=renderRecos;
 
 document.getElementById('addBtn').onclick=()=>{
+  if(addMode==='expr')return addExpr();
   const fr=inFr.value.trim();
   if(!fr){toast('请先输入单词');inFr.focus();return;}
   if(!chosenTopic){toast('请选择一个主题，或新建主题');return;}
   ensureTopic(chosenTopic);
   const senses=draftSenses.filter(s=>s.zh.trim()||s.eg.trim()).map(s=>({...s,zh:s.zh.trim(),eg:s.eg.trim()}));
-  state.words.unshift({id:"w"+Date.now(),fr,pos:inPos.value,senses,
+  state.words.unshift({id:"w"+Date.now(),type:'word',fr,pos:inPos.value,senses,
     note:inNote.value.trim(),topic:chosenTopic,ts:Date.now()});
   save();resetAdd();render();
 };
+function addExpr(){
+  const rows=draftSenses.filter(s=>(s.fr&&s.fr.trim())||(s.zh&&s.zh.trim())||(s.eg&&s.eg.trim()))
+    .map(s=>({fr:(s.fr||'').trim(),zh:(s.zh||'').trim(),eg:(s.eg||'').trim(),b:!!s.b,h:!!s.h,c:!!s.c}));
+  if(!rows.length){toast('请至少录入一条表达（法语+中文）');return;}
+  const group=inFr.value.trim();
+  if(!chosenTopic){toast('请选择一个主题，或新建主题');return;}
+  ensureTopic(chosenTopic);
+  const title=group||(rows[0].fr||rows[0].zh||'表达');
+  state.words.unshift({id:"e"+Date.now(),type:'expr',fr:title,group:group,senses:rows,
+    note:inNote.value.trim(),topic:chosenTopic,ts:Date.now()});
+  save();resetAdd();render();
+}
 function resetAdd(){inFr.value='';inPos.value='';inNote.value='';chosenTopic=null;
-  draftSenses=[blankSense()];document.getElementById('chosenTag').textContent='';
+  draftSenses=[addMode==='expr'?blankExpr():blankSense()];document.getElementById('chosenTag').textContent='';
   document.getElementById('recos').innerHTML='';document.getElementById('recoHint').style.display='none';renderAddSenses();}
 document.getElementById('clearBtn').onclick=resetAdd;
 
@@ -608,17 +719,27 @@ async function deleteTopic(t){
 }
 
 /* ---------- 查阅渲染 ---------- */
-let curTopic='all',curQuery='',curSort='new';
+let curTopic='all',curQuery='',curSort='new',curType='all';
 function senseHTML(s,i){
   let cls='';
   if(s.b)cls+=' s-b'; if(s.h)cls+=' s-h'; if(s.c)cls+=' s-c';
   const eg=s.eg?`<span class="eg">${esc(s.eg)}</span>`:'';
   return `<div class="sense"><span class="idx">${i+1}.</span><span class="${cls}">${esc(s.zh)||'—'}</span>${eg}</div>`;
 }
+function exprLinesHTML(w){
+  const rows=(w.senses&&w.senses.length)?w.senses:[];
+  const title=w.group?`<div class="expr-group-title">${esc(w.group)}</div>`:'';
+  const body=rows.map((s,i)=>{
+    let cls=''; if(s.b)cls+=' s-b'; if(s.h)cls+=' s-h'; if(s.c)cls+=' s-c';
+    const eg=s.eg?`<span class="eg">${esc(s.eg)}</span>`:'';
+    return `<div class="eline"><span class="enum">${i+1}</span><span class="efr">${esc(s.fr)||'—'}</span><span class="earrow">→</span><span class="${cls}">${esc(s.zh)||'—'}</span>${eg}</div>`;
+  }).join('');
+  return title+`<div class="erow-list">${body||'<div class="sense" style="color:var(--muted)">—</div>'}</div>`;
+}
 function renderChips(){
-  const counts={};state.words.forEach(w=>counts[w.topic]=(counts[w.topic]||0)+1);
+  const counts={};state.words.forEach(w=>{const c=counts[w.topic]||(counts[w.topic]={n:0,e:0});w.type==='expr'?c.e++:c.n++;});
   let html=`<button class="chip ${curTopic==='all'?'on':''}" data-t="all">全部 <span class="c">${state.words.length}</span></button>`;
-  state.topics.forEach(t=>{html+=`<button class="chip ${curTopic===t?'on':''}" data-t="${esc(t)}">${ICONS[t]||'🏷️'} ${esc(t)} <span class="c">${counts[t]||0}</span><span class="mini" data-act="rename" title="重命名">✎</span><span class="mini danger" data-act="del" title="删除主题">✕</span></button>`;});
+  state.topics.forEach(t=>{html+=`<button class="chip ${curTopic===t?'on':''}" data-t="${esc(t)}">${ICONS[t]||'🏷️'} ${esc(t)} <span class="c">${((counts[t]||{}).n)||0}${(counts[t]||{}).e?`·${counts[t].e}💬`:''}</span><span class="mini" data-act="rename" title="重命名">✎</span><span class="mini danger" data-act="del" title="删除主题">✕</span></button>`;});
   document.getElementById('chips').innerHTML=html;
   document.getElementById('chips').querySelectorAll('.chip').forEach(c=>{
     const rn=c.querySelector('[data-act=rename]'),dl=c.querySelector('[data-act=del]');
@@ -631,27 +752,31 @@ function renderGrid(){
   const q=curQuery.trim().toLowerCase();
   let list=state.words.filter(w=>{
     if(curTopic!=='all'&&w.topic!==curTopic)return false;
-    if(q){const hay=(w.fr+' '+(w.senses||[]).map(s=>s.zh+' '+s.eg).join(' ')+' '+(w.note||'')).toLowerCase();
+    if(curType!=='all'&&(w.type||'word')!==curType)return false;
+    if(q){const hay=(w.fr+' '+(w.senses||[]).map(s=>(s.fr||'')+' '+s.zh+' '+s.eg).join(' ')+' '+(w.note||'')).toLowerCase();
       if(!hay.includes(q))return false;}
     return true;});
   if(curSort==='new')list.sort((a,b)=>(b.ts||0)-(a.ts||0));
   if(curSort==='old')list.sort((a,b)=>(a.ts||0)-(b.ts||0));
   if(curSort==='az')list.sort((a,b)=>a.fr.localeCompare(b.fr,'fr'));
   const grid=document.getElementById('grid');
-  if(!list.length){grid.innerHTML=`<div class="empty"><div>📓</div>生词本还是空的，上面添加第一个词吧</div>`;return;}
-  grid.innerHTML=list.map(w=>`
-    <div class="card" data-id="${w.id}">
-      <span class="tag">${ICONS[w.topic]||'🏷️'} ${esc(w.topic)}</span>
-      <div class="fr">${esc(w.fr)}</div>
+  if(!list.length){grid.innerHTML=`<div class="empty"><div>📓</div>生词本还是空的，上面添加第一个词或表达吧</div>`;return;}
+  grid.innerHTML=list.map(w=>{
+    const isExpr=(w.type||'word')==='expr';
+    return `
+    <div class="card ${isExpr?'exprcard':''}" data-id="${w.id}">
+      <span class="tag">${ICONS[w.topic]||'🏷️'} ${esc(w.topic)}${isExpr?' · 💬表达':''}</span>
+      ${isExpr?`<div class="fr">💬 ${esc(w.fr)}</div>${exprLinesHTML(w)}`
+        :`<div class="fr">${esc(w.fr)}</div>
       ${w.pos?`<span class="pos">${esc(w.pos)}</span>`:''}
-      <div class="senses">${(w.senses&&w.senses.length)?w.senses.map(senseHTML).join(''):'<div class="sense" style="color:var(--muted)">—</div>'}</div>
+      <div class="senses">${(w.senses&&w.senses.length)?w.senses.map(senseHTML).join(''):'<div class="sense" style="color:var(--muted)">—</div>'}</div>`}
       ${w.note?`<div class="note">📝 ${esc(w.note)}</div>`:''}
       <div class="meta">
         <span>${new Date(w.ts||Date.now()).toLocaleDateString('zh-CN')}</span>
         <button class="edit" data-act="edit">编辑</button>
         <button class="del" data-act="del">删除</button>
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
   grid.querySelectorAll('.card').forEach(card=>{
     const id=card.dataset.id;
     card.querySelector('[data-act=del]').onclick=async()=>{if(await uiConfirm('删除生词','确定删除这个生词？')){state.words=state.words.filter(x=>x.id!==id);Object.values(state.order||{}).forEach(a=>{const i=a.indexOf(id);if(i>=0)a.splice(i,1);});save();render();}};
@@ -702,17 +827,17 @@ function renderShelf(){
   const counts={};state.words.forEach(w=>counts[w.topic]=(counts[w.topic]||0)+1);
   const list=state.topics.filter(t=>!q||t.toLowerCase().includes(q));
   let html=list.map(t=>{
-    const sample=state.words.filter(w=>w.topic===t).slice(0,3).map(w=>esc(w.fr)).join('、');
+    const sample=state.words.filter(w=>w.topic===t).slice(0,3).map(w=>(w.type==='expr'?'💬':'')+esc(w.fr)).join('、');
     return `<button class="book" data-t="${esc(t)}">
       <span class="bacts"><span data-act="rename" title="重命名">✎</span><span data-act="del" title="删除">✕</span></span>
       <span class="bico">${ICONS[t]||'🏷️'}</span>
       <span class="bname">${esc(t)}</span>
-      <span class="bcount">${counts[t]||0} 词${sample?' · '+sample:''}</span>
+      <span class="bcount">${((counts[t]||{}).n)||0} 词 · ${((counts[t]||{}).e)||0} 表达${sample?' · '+sample:''}</span>
     </button>`;
   }).join('');
   html+=`<button class="bookadd" id="bookAdd">＋ 新建主题</button>`;
   const el=document.getElementById('shelves');el.innerHTML=html;
-  document.getElementById('bookCountLabel').textContent=`共 ${state.words.length} 词 · ${state.topics.length} 个主题`;
+  document.getElementById('bookCountLabel').textContent=`共 ${state.words.filter(w=>w.type!=='expr').length} 词 · ${state.words.filter(w=>w.type==='expr').length} 表达 · ${state.topics.length} 个主题`;
   el.querySelectorAll('.book').forEach(b=>{
     const t=b.dataset.t;
     b.querySelector('[data-act=rename]').onclick=e=>{e.stopPropagation();renameTopicPrompt(t);};
@@ -755,8 +880,10 @@ function renderWordsView(){
         <button data-mv="bottom" title="置底">⇊</button>
       </div>
       <div class="wmain">
-        <div class="wfr">${esc(w.fr)}${w.pos?`<span class="wpos">${esc(w.pos)}</span>`:''}</div>
-        <div class="wzh">${(w.senses&&w.senses.length)?w.senses.map((s,j)=>`<span class="${s.b?'s-b':''} ${s.h?'s-h':''} ${s.c?'s-c':''}">${esc(s.zh)||'—'}</span>`).join('　'):'—'}</div>
+        <div class="wfr">${(w.type||'word')==='expr'?'💬 ':''}${esc(w.fr)}${w.pos?`<span class="wpos">${esc(w.pos)}</span>`:''}</div>
+        ${(w.type||'word')==='expr'
+          ? `<div class="wzh">${(w.senses&&w.senses.length)?w.senses.map((s,j)=>`<span class="${s.b?'s-b':''} ${s.h?'s-h':''} ${s.c?'s-c':''}"><b>${esc(s.fr)||'—'}</b> → ${esc(s.zh)||'—'}</span>`).join('<br>'):'—'}</div>`
+          : `<div class="wzh">${(w.senses&&w.senses.length)?w.senses.map((s,j)=>`<span class="${s.b?'s-b':''} ${s.h?'s-h':''} ${s.c?'s-c':''}">${esc(s.zh)||'—'}</span>`).join('　'):'—'}</div>`}
         ${w.note?`<div class="wnote">📝 ${esc(w.note)}</div>`:''}
       </div>
       <div class="wops">
@@ -781,28 +908,31 @@ wordSearchEl.oninput=renderWordsView;
 document.getElementById('bookSortSel').onchange=renderWordsView;
 
 function render(){
-  document.getElementById('countLabel').textContent=`共 ${state.words.length} 词 · ${state.topics.length} 个主题`;
+  document.getElementById('countLabel').textContent=`共 ${state.words.filter(w=>w.type!=='expr').length} 词 · ${state.words.filter(w=>w.type==='expr').length} 表达 · ${state.topics.length} 个主题`;
   renderChips();renderGrid();
   if(curPage==='book'){if(bookTopic)renderWordsView();else renderShelf();}
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 /* ---------- 编辑弹窗 ---------- */
-let editingId=null,editSenses=[],editTopic=null;
+let editingId=null,editSenses=[],editTopic=null,editType='word';
 const mask=document.getElementById('mask');
 function openEdit(id){
   const w=state.words.find(x=>x.id===id);if(!w)return;editingId=id;
-  document.getElementById('eFr').value=w.fr;
+  editType=w.type||'word';
+  document.getElementById('eFr').value=(editType==='expr'&&w.group)?w.group:w.fr;
   document.getElementById('ePos').value=w.pos||'';
   document.getElementById('eNote').value=w.note||'';
-  editSenses=(w.senses&&w.senses.length)?w.senses.map(s=>({...s})):[blankSense()];
+  const blank=editType==='expr'?blankExpr:blankSense;
+  editSenses=(w.senses&&w.senses.length)?w.senses.map(s=>({...s})):[blank()];
   editTopic=w.topic;
   renderEditSenses();renderEditRecos();
   mask.classList.add('show');
 }
 function renderEditSenses(){const c=document.getElementById('eSenseList');
-  renderSenseList(c,editSenses);editSenses._render=()=>renderEditSenses();bindSenseList(c,()=>editSenses);}
-document.getElementById('eAddSense').onclick=()=>{editSenses.push(blankSense());renderEditSenses();};
+  if(editType==='expr'){renderExprList(c,editSenses);editSenses._render=()=>renderEditSenses();bindExprList(c,()=>editSenses);}
+  else{renderSenseList(c,editSenses);editSenses._render=()=>renderEditSenses();bindSenseList(c,()=>editSenses);}}
+document.getElementById('eAddSense').onclick=()=>{editSenses.push(editType==='expr'?blankExpr():blankSense());renderEditSenses();};
 function renderEditRecos(){
   const fr=document.getElementById('eFr').value.trim();const box=document.getElementById('eRecos');
   const rec=recommend(fr);const all=[];[...rec,...state.topics].forEach(t=>{if(!all.includes(t))all.push(t);});
@@ -818,10 +948,20 @@ document.getElementById('eFr').oninput=renderEditRecos;
 document.getElementById('eCancel').onclick=()=>mask.classList.remove('show');
 document.getElementById('eSave').onclick=()=>{
   const w=state.words.find(x=>x.id===editingId);if(!w)return;
-  const fr=document.getElementById('eFr').value.trim();if(!fr){toast('单词不能为空');return;}
+  const fr=document.getElementById('eFr').value.trim();
   ensureTopic(editTopic);
-  w.fr=fr;w.pos=document.getElementById('ePos').value;
-  w.senses=editSenses.filter(s=>s.zh.trim()||s.eg.trim()).map(s=>({...s,zh:s.zh.trim(),eg:s.eg.trim()}));
+  if(editType==='expr'){
+    const rows=editSenses.filter(s=>(s.fr&&s.fr.trim())||(s.zh&&s.zh.trim())||(s.eg&&s.eg.trim()))
+      .map(s=>({fr:(s.fr||'').trim(),zh:(s.zh||'').trim(),eg:(s.eg||'').trim(),b:!!s.b,h:!!s.h,c:!!s.c}));
+    if(!rows.length){toast('请至少保留一条表达');return;}
+    w.group=fr;w.type='expr';
+    w.fr=fr||(rows[0].fr||rows[0].zh||'表达');
+    w.senses=rows;w.pos='';
+  }else{
+    if(!fr){toast('单词不能为空');return;}
+    w.type='word';w.fr=fr;w.pos=document.getElementById('ePos').value;
+    w.senses=editSenses.filter(s=>s.zh.trim()||s.eg.trim()).map(s=>({...s,zh:s.zh.trim(),eg:s.eg.trim()}));
+  }
   w.note=document.getElementById('eNote').value.trim();w.topic=editTopic;
   save();mask.classList.remove('show');render();
 };
@@ -830,6 +970,11 @@ mask.onclick=e=>{if(e.target===mask)mask.classList.remove('show');};
 /* ---------- 导入导出 / 工具条 ---------- */
 document.getElementById('search').oninput=e=>{curQuery=e.target.value;renderGrid();};
 document.getElementById('sortSel').onchange=e=>{curSort=e.target.value;renderGrid();};
+document.querySelectorAll('#typeSel button').forEach(b=>{
+  b.onclick=()=>{curType=b.dataset.type;
+    document.querySelectorAll('#typeSel button').forEach(x=>x.classList.toggle('on',x===b));
+    renderGrid();};
+});
 document.getElementById('exportBtn').onclick=()=>{
   const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carnet_法语生词本.json';a.click();};
