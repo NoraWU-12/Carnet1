@@ -202,22 +202,40 @@
   /* 笔记本视图 */
   .bookbar{display:flex;gap:10px;align-items:center;margin:0 0 14px;flex-wrap:wrap}
   .bookbar .search{flex:1;min-width:180px}
-  .shelves{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding-bottom:40px}
-  .book{position:relative;background:linear-gradient(150deg,var(--brand-2),var(--brand));color:#fff;
-    border-radius:12px;padding:18px 16px 16px;min-height:118px;cursor:pointer;text-align:left;
-    box-shadow:var(--shadow);border:none;font-family:inherit;width:100%;transition:.18s;
-    display:flex;flex-direction:column;justify-content:space-between}
-  .book:hover{transform:translateY(-3px)}
-  .book .bico{font-size:28px}
-  .book .bname{font-size:16px;font-weight:700;margin-top:8px;word-break:break-all}
-  .book .bcount{font-size:11.5px;opacity:.9;margin-top:4px}
-  .book .bacts{position:absolute;top:10px;right:8px;display:flex;gap:2px}
-  .book .bacts button{border:none;background:rgba(255,255,255,.18);color:#fff;border-radius:7px;
-    width:24px;height:24px;line-height:1;cursor:pointer;font-size:12px}
-  .book .bacts button:hover{background:rgba(255,255,255,.4);color:var(--brand)}
-  .bookadd{background:var(--card);border:2px dashed var(--line);color:var(--muted);
-    border-radius:12px;min-height:118px;cursor:pointer;font-family:inherit;font-size:14px;transition:.18s}
-  .bookadd:hover{border-color:var(--brand);color:var(--brand)}
+  .shelves{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;padding-bottom:40px}
+  .book{--c1:#a478e0;--c2:#8257c9;position:relative;display:flex;text-align:left;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    min-height:132px;cursor:pointer;font-family:inherit;padding:0;width:100%;transition:.2s;
+    box-shadow:0 2px 8px rgba(96,62,160,.06)}
+  .book.c0{--c1:#b48ae6;--c2:#8a5fd0}.book.c1{--c1:#9d8be8;--c2:#6f56c9}
+  .book.c2{--c1:#c08ad4;--c2:#9559b8}.book.c3{--c1:#8fa8e8;--c2:#5f74c9}
+  .book.c4{--c1:#d18ab8;--c2:#a8588c}.book.c5{--c1:#8ab8d8;--c2:#586fa8}
+  .book:hover{transform:translateY(-4px);box-shadow:0 10px 22px rgba(96,62,160,.16);border-color:#d9c9f2}
+  .book .bspine{width:8px;flex:0 0 8px;background:linear-gradient(180deg,var(--c1),var(--c2));position:relative}
+  .book .bspine::after{content:'';position:absolute;left:2px;top:50%;transform:translateY(-50%);
+    width:2px;height:60%;background:rgba(255,255,255,.45);border-radius:2px}
+  .book .bmain{flex:1;min-width:0;padding:13px 12px 12px 14px;display:flex;flex-direction:column;gap:6px}
+  .book .bhead{display:flex;align-items:flex-start;gap:6px}
+  .book .bico{font-size:17px;margin-right:4px}
+  .book .bname{font-size:15.5px;font-weight:700;color:var(--ink);word-break:break-all;flex:1;line-height:1.35}
+  .book .bacts{display:flex;gap:3px;opacity:0;transition:.15s}
+  .book:hover .bacts,.book .bacts:focus-within{opacity:1}
+  @media(hover:none){.book .bacts{opacity:1}}
+  .book .bacts span{width:22px;height:22px;line-height:22px;text-align:center;border-radius:6px;
+    font-size:12px;color:var(--muted);background:var(--bg)}
+  .book .bacts span:hover{background:var(--brand-soft);color:var(--brand)}
+  .book .bstat{font-size:12px;color:var(--muted)}
+  .book .bstat b{color:var(--brand);font-size:14px}
+  .book .bprev{display:flex;flex-wrap:wrap;gap:4px;margin-top:1px;min-height:20px}
+  .book .bpill{font-size:11px;padding:1px 7px;border-radius:99px;background:var(--brand-soft);color:#6a4aa8;
+    max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .book .bempty{font-size:11.5px;color:#b5aeca}
+  .book .bbar{margin-top:auto;height:4px;border-radius:99px;background:var(--line);overflow:hidden}
+  .book .bbar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--c1),var(--c2));transition:.3s}
+  .bookadd{display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;
+    border:2px dashed #cfc0e8;color:var(--muted);border-radius:14px;min-height:132px;
+    cursor:pointer;font-family:inherit;font-size:14px;transition:.18s}
+  .bookadd:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
   .bookhead{display:flex;align-items:center;gap:10px;margin:0 0 12px;flex-wrap:wrap}
   .backbtn{border:1px solid var(--line);background:var(--card);color:var(--brand);border-radius:99px;
     padding:7px 14px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer}
@@ -243,9 +261,10 @@
   .wrow .wops button:hover{color:var(--brand)}
   .wrow .wops button.danger:hover{color:#e05a5a}
   @media(max-width:560px){
-    .shelves{grid-template-columns:repeat(2,1fr);gap:10px}
-    .book{min-height:104px;padding:13px 12px}
+    .shelves{grid-template-columns:1fr;gap:10px}
+    .book{min-height:0}
     .book .bname{font-size:14px}
+    .book .bpill{max-width:110px}
   }
 
   /* 自定义对话框（替代被独立模式屏蔽的 alert/confirm/prompt） */
@@ -281,6 +300,7 @@
   <div class="tabs">
     <button class="tab on" data-page="main">✏️ 录入 / 查阅</button>
     <button class="tab" data-page="book">📓 我的单词本</button>
+    <button class="tab" data-page="notes">🗒️ 常识积累</button>
   </div>
 
   <!-- ============ 页面一：录入 / 查阅 ============ -->
@@ -352,6 +372,7 @@
       <option value="new">最近添加</option>
       <option value="old">最早添加</option>
       <option value="az">法语 A→Z</option>
+      <option value="pos">按词性分类</option>
     </select>
   </div>
   <div class="chips" id="chips"></div>
@@ -388,12 +409,97 @@
           <option value="new">最近添加</option>
           <option value="old">最早添加</option>
           <option value="az">法语 A→Z</option>
+          <option value="pos">按词性分类</option>
         </select>
       </div>
       <div class="wordlist" id="wordList"></div>
     </div>
   </div><!-- /#pageBook -->
+
+  <!-- ============ 页面三：常识积累 ============ -->
+  <div class="page" id="pageNotes">
+    <div id="noteListView">
+      <div class="hero"><h1>常识积累</h1><span id="noteCountLabel"></span></div>
+      <div class="bookbar">
+        <div class="search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="noteSearch" placeholder="搜索标题、分支或正文…" autocomplete="off">
+        </div>
+        <select class="sortsel" id="noteLevelSel">
+          <option value="all">全部等级</option>
+          <option value="B1">B1</option><option value="B2">B2</option>
+          <option value="C1">C1</option><option value="C2">C2</option>
+          <option value="精听">🎧 仅精听</option>
+        </select>
+        <select class="sortsel" id="noteSortSel">
+          <option value="new">最近添加</option>
+          <option value="old">最早添加</option>
+          <option value="az">标题 A→Z</option>
+        </select>
+        <button class="btn primary sm" id="noteNew">＋ 新建记录</button>
+      </div>
+      <div id="noteList"></div>
+    </div>
+    <div id="noteEditView" style="display:none">
+      <div class="bookhead">
+        <button class="backbtn" id="backNotes">← 常识积累</button>
+        <h2 id="noteEditTitle">新建记录</h2>
+        <span id="noteEditStat" style="font-size:12px;color:var(--muted)"></span>
+      </div>
+      <section class="adder">
+        <div class="row">
+          <div class="fld" style="flex:2"><label>标题（如：香奈儿纪录片）</label>
+            <input type="text" id="nTitle" placeholder="如 Chanel 纪录片《…》" autocomplete="off"></div>
+          <div class="fld"><label>语言等级</label>
+            <select id="nLevel">
+              <option value="B1">B1</option><option value="B2" selected>B2</option>
+              <option value="C1">C1</option><option value="C2">C2</option>
+            </select></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="fld" style="flex:2"><label>来源（选填）</label>
+            <input type="text" id="nSrc" placeholder="如 Netflix / 播客名 / 网站链接" autocomplete="off"></div>
+          <div class="fld"><label>精听内容</label>
+            <label style="display:flex;align-items:center;gap:8px;font-weight:400;margin-top:6px">
+              <input type="checkbox" id="nListen" style="width:18px;height:18px;accent-color:var(--brand)"> <span>是，这是精听内容 🎧</span></label></div>
+        </div>
+        <div class="section-title" id="branchTitle">分支（自己起名，如 名人名言 / 社会新闻 / 时尚史）</div>
+        <div id="branchList"></div>
+        <button class="btn sm" id="addBranch">＋ 添加一个分支</button>
+        <div class="actions" style="margin-top:14px">
+          <button class="btn" id="noteCancel">取消</button>
+          <button class="btn primary" id="noteSave">保存记录</button>
+        </div>
+      </section>
+    </div>
+  </div><!-- /#pageNotes -->
 </main>
+
+<style>
+  /* ===== 常识积累 ===== */
+  .branch{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;margin-bottom:10px}
+  .branch .brow{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .branch .brow input.bname{flex:1;font-weight:600}
+  .branch textarea.bcontent{width:100%;min-height:96px;resize:vertical;font-family:inherit;font-size:14px;line-height:1.8;
+    color:#3d3852;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;outline:none}
+  .branch textarea.bcontent:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .ncard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px}
+  .ncard .ntop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ncard .ntitle{font-size:16px;font-weight:700;color:#3d3158;cursor:pointer;flex:1;min-width:120px}
+  .ncard .ntitle:hover{color:var(--brand)}
+  .lv{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--brand-soft);color:var(--brand)}
+  .lv.listen{background:#ede7fb;color:#6d3bb8}
+  .ncard .nsrc{font-size:12px;color:var(--muted);margin-top:4px}
+  .ncard .nbranch{border-left:3px solid var(--brand-soft);padding:2px 0 2px 10px;margin:8px 0 0}
+  .ncard .nbname{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:2px}
+  .ncard .nbcontent{font-size:13px;color:#5b5470;white-space:pre-wrap;line-height:1.7}
+  .ncard .nmeta{margin-top:10px;display:flex;justify-content:flex-end;gap:8px}
+  .ncard .nmeta button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;color:#6f6990}
+  .ncard .nmeta button.danger{color:#c0392b}
+  .wrow .wegs{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px}
+  .wrow .wegs .weg{font-size:11px;color:var(--brand);background:var(--brand-soft);border-radius:99px;padding:2px 9px;max-width:220px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
 
 <footer>Carnet · 数据自动保存在本机浏览器 · 淡紫主题</footer>
 
@@ -443,7 +549,9 @@
 
 <script>
 const DEFAULT_TOPICS=["日常","医疗","人工智能","时尚","美食","旅行","职场","科技","学习","娱乐"];
+const POS_ORDER=['n.m.','n.f.','n.m./f.','v.i.','v.t.','v.pr.','adj.','adv.','prép.','conj.','pron.','其他','__expr'];
 const ICONS={"日常":"☕","医疗":"🏥","人工智能":"🤖","时尚":"👗","美食":"🥐","旅行":"✈️","职场":"💼","科技":"💻","学习":"📚","娱乐":"🎬"};
+const Pick=(map,key)=>map[key]||'';   // 自定义主题不显示图标
 const KEYWORDS={
   "医疗":["médecin","médicament","ordonnance","symptôme","urgence","hôpital","maladie","douleur","fièvre","toux","pharmacie","rendez-vous","santé","docteur"],
   "人工智能":["intelligence","artificielle","algorithme","données","apprentissage","neurones","réseau","modèle","robot","chatbot"],
@@ -460,7 +568,7 @@ const KEY="carnet_fr_v2";
 let state=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.words){migrate(s);return s;}}catch(e){}
   return {words:[],topics:[...DEFAULT_TOPICS]};}
-function migrate(s){s.topics=s.topics||[...DEFAULT_TOPICS];s.order=s.order||{};
+function migrate(s){s.topics=s.topics||[...DEFAULT_TOPICS];s.order=s.order||{};s.notes=s.notes||[];
   s.words.forEach(w=>{if(!w.type)w.type='word';
     if(w.type==='expr'&&w.senses)w.senses.forEach(sn=>{if(sn.fr===undefined)sn.fr='';});});}
 let saveTimer=null;
@@ -474,6 +582,11 @@ function renameTopic(oldT,newT){state.topics=state.topics.map(t=>t===oldT?newT:t
   state.words.forEach(w=>{if(w.topic===oldT)w.topic=newT;});}
 function dropTopic(t){state.topics=state.topics.filter(x=>x!==t);}
 const blankSense=()=>({zh:"",eg:"",b:false,h:false,c:false});
+state.notes=state.notes||[];
+const LEVELS=['B1','B2','C1','C2'];
+function newNote(){return {id:'n'+Date.now()+Math.random().toString(36).slice(2,6),ts:Date.now(),
+  title:'',level:'B2',src:'',listen:false,branches:[{id:'b0',name:'摘录',content:''}]};}
+function noteStat(n){let c=0,k=0;(n.branches||[]).forEach(b=>{k+=(b.content||'').length;if((b.content||'').trim())c++;});return {c,k};}
 
 /* ---------- 推荐主题 ---------- */
 function recommend(fr){
@@ -617,7 +730,7 @@ function renderRecos(){
   if(all.length===0&&!fr){box.innerHTML='';hint.style.display='none';}
   else{box.innerHTML=all.map(t=>{
     const isRec=rec.includes(t);
-    return `<button class="reco ${chosenTopic===t?'sel':''}" data-t="${esc(t)}">${isRec?'✨ ':''}${ICONS[t]||'🏷️'} ${esc(t)}</button>`;
+    return `<button class="reco ${chosenTopic===t?'sel':''}" data-t="${esc(t)}">${isRec?'✨ ':''}${Pick(ICONS,t)}${esc(t)}</button>`;
   }).join('')+`<span class="createWrap" id="createWrap"><button class="reco create" data-nk="open">＋ 新建主题…</button></span>`;
     hint.style.display='block';
     box.querySelectorAll('.reco[data-t]').forEach(b=>{
@@ -739,7 +852,7 @@ function exprLinesHTML(w){
 function renderChips(){
   const counts={};state.words.forEach(w=>{const c=counts[w.topic]||(counts[w.topic]={n:0,e:0});w.type==='expr'?c.e++:c.n++;});
   let html=`<button class="chip ${curTopic==='all'?'on':''}" data-t="all">全部 <span class="c">${state.words.length}</span></button>`;
-  state.topics.forEach(t=>{html+=`<button class="chip ${curTopic===t?'on':''}" data-t="${esc(t)}">${ICONS[t]||'🏷️'} ${esc(t)} <span class="c">${((counts[t]||{}).n)||0}${(counts[t]||{}).e?`·${counts[t].e}💬`:''}</span><span class="mini" data-act="rename" title="重命名">✎</span><span class="mini danger" data-act="del" title="删除主题">✕</span></button>`;});
+  state.topics.forEach(t=>{html+=`<button class="chip ${curTopic===t?'on':''}" data-t="${esc(t)}">${Pick(ICONS,t)}${esc(t)} <span class="c">${((counts[t]||{}).n)||0}${(counts[t]||{}).e?`·${counts[t].e}💬`:''}</span><span class="mini" data-act="rename" title="重命名">✎</span><span class="mini danger" data-act="del" title="删除主题">✕</span></button>`;});
   document.getElementById('chips').innerHTML=html;
   document.getElementById('chips').querySelectorAll('.chip').forEach(c=>{
     const rn=c.querySelector('[data-act=rename]'),dl=c.querySelector('[data-act=del]');
@@ -759,13 +872,18 @@ function renderGrid(){
   if(curSort==='new')list.sort((a,b)=>(b.ts||0)-(a.ts||0));
   if(curSort==='old')list.sort((a,b)=>(a.ts||0)-(b.ts||0));
   if(curSort==='az')list.sort((a,b)=>a.fr.localeCompare(b.fr,'fr'));
+  if(curSort==='pos')list.sort((a,b)=>{
+    const pa=(a.type||'word')==='expr'?'__expr':(a.pos||'zzz'),pb=(b.type||'word')==='expr'?'__expr':(b.pos||'zzz');
+    const paIdx=POS_ORDER.indexOf(pa),pbIdx=POS_ORDER.indexOf(pb);
+    const c=(paIdx<0?99:paIdx)-(pbIdx<0?99:pbIdx);
+    return c!==0?c:a.fr.localeCompare(b.fr,'fr');});
   const grid=document.getElementById('grid');
   if(!list.length){grid.innerHTML=`<div class="empty"><div>📓</div>生词本还是空的，上面添加第一个词或表达吧</div>`;return;}
   grid.innerHTML=list.map(w=>{
     const isExpr=(w.type||'word')==='expr';
     return `
     <div class="card ${isExpr?'exprcard':''}" data-id="${w.id}">
-      <span class="tag">${ICONS[w.topic]||'🏷️'} ${esc(w.topic)}${isExpr?' · 💬表达':''}</span>
+      <span class="tag">${Pick(ICONS,w.topic)}${esc(w.topic)}${isExpr?' · 💬表达':''}</span>
       ${isExpr?`<div class="fr">💬 ${esc(w.fr)}</div>${exprLinesHTML(w)}`
         :`<div class="fr">${esc(w.fr)}</div>
       ${w.pos?`<span class="pos">${esc(w.pos)}</span>`:''}
@@ -796,6 +914,11 @@ function sortedBy(w,key){
   if(key==='new')return[...w].sort((a,b)=>(b.ts||0)-(a.ts||0));
   if(key==='old')return[...w].sort((a,b)=>(a.ts||0)-(b.ts||0));
   if(key==='az')return[...w].sort((a,b)=>a.fr.localeCompare(b.fr,'fr'));
+  if(key==='pos')return[...w].sort((a,b)=>{
+    const pa=(a.type||'word')==='expr'?'__expr':(a.pos||'zzz'),pb=(b.type||'word')==='expr'?'__expr':(b.pos||'zzz');
+    const paIdx=POS_ORDER.indexOf(pa),pbIdx=POS_ORDER.indexOf(pb);
+    const c=(paIdx<0?99:paIdx)-(pbIdx<0?99:pbIdx);
+    return c!==0?c:a.fr.localeCompare(b.fr,'fr');});
   return w;
 }
 function moveWord(id,dir){
@@ -815,7 +938,9 @@ document.querySelectorAll('.tab').forEach(tb=>{
     document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===tb));
     document.getElementById('pageMain').classList.toggle('on',curPage==='main');
     document.getElementById('pageBook').classList.toggle('on',curPage==='book');
+    document.getElementById('pageNotes').classList.toggle('on',curPage==='notes');
     if(curPage==='book'){if(bookTopic)renderWordsView();else renderShelf();}
+    if(curPage==='notes'){if(notesEditing){}else showNoteList();}
   };
 });
 
@@ -824,20 +949,31 @@ let bookTopic=null,bookQuery='',bookSort='manual';
 const bookSearchEl=document.getElementById('bookSearch'),wordSearchEl=document.getElementById('wordSearch');
 function renderShelf(){
   const q=bookSearchEl.value.trim().toLowerCase();
-  const counts={};state.words.forEach(w=>counts[w.topic]=(counts[w.topic]||0)+1);
+  const counts={};state.words.forEach(w=>{(counts[w.topic]=counts[w.topic]||{n:0,e:0})[(w.type==='expr'?'e':'n')]++;});
   const list=state.topics.filter(t=>!q||t.toLowerCase().includes(q));
-  let html=list.map(t=>{
-    const sample=state.words.filter(w=>w.topic===t).slice(0,3).map(w=>(w.type==='expr'?'💬':'')+esc(w.fr)).join('、');
-    return `<button class="book" data-t="${esc(t)}">
-      <span class="bacts"><span data-act="rename" title="重命名">✎</span><span data-act="del" title="删除">✕</span></span>
-      <span class="bico">${ICONS[t]||'🏷️'}</span>
-      <span class="bname">${esc(t)}</span>
-      <span class="bcount">${((counts[t]||{}).n)||0} 词 · ${((counts[t]||{}).e)||0} 表达${sample?' · '+sample:''}</span>
+  const totalW=state.words.filter(w=>w.type!=='expr').length,totalE=state.words.length-totalW;
+  let html=list.map((t,i)=>{
+    const ws=state.words.filter(w=>w.topic===t);
+    const n=ws.filter(w=>w.type!=='expr').length,e=ws.length-n;
+    const sample=ws.slice(0,3).map(w=>(w.type==='expr'?'💬':'')+esc(w.fr));
+    const ico=Pick(ICONS,t);
+    const pct=Math.min(100,Math.round(ws.length/20*100));
+    return `<button class="book c${i%6}" data-t="${esc(t)}">
+      <span class="bspine"></span>
+      <span class="bmain">
+        <span class="bhead">
+          <span class="bname">${ico?`<span class="bico">${ico}</span>`:''}${esc(t)}</span>
+          <span class="bacts"><span data-act="rename" title="重命名">✎</span><span data-act="del" title="删除">✕</span></span>
+        </span>
+        <span class="bstat"><b>${n}</b> 词 · <b>${e}</b> 表达</span>
+        <span class="bprev">${sample.length?sample.map(s=>`<span class="bpill">${s}</span>`).join(''):'<span class="bempty">还没有内容，点开添加 →</span>'}</span>
+        <span class="bbar"><span style="width:${pct}%"></span></span>
+      </span>
     </button>`;
   }).join('');
   html+=`<button class="bookadd" id="bookAdd">＋ 新建主题</button>`;
   const el=document.getElementById('shelves');el.innerHTML=html;
-  document.getElementById('bookCountLabel').textContent=`共 ${state.words.filter(w=>w.type!=='expr').length} 词 · ${state.words.filter(w=>w.type==='expr').length} 表达 · ${state.topics.length} 个主题`;
+  document.getElementById('bookCountLabel').textContent=`共 ${totalW} 词 · ${totalE} 表达 · ${state.topics.length} 本`;
   el.querySelectorAll('.book').forEach(b=>{
     const t=b.dataset.t;
     b.querySelector('[data-act=rename]').onclick=e=>{e.stopPropagation();renameTopicPrompt(t);};
@@ -859,7 +995,7 @@ function renderWordsView(){
   const t=bookTopic;if(!t)return showShelf();
   document.getElementById('shelfView').style.display='none';
   document.getElementById('wordsView').style.display='block';
-  document.getElementById('wordsTitle').textContent=(ICONS[t]||'🏷️')+' '+t;
+  document.getElementById('wordsTitle').textContent=(Pick(ICONS,t)+t);
   let list=state.words.filter(w=>w.topic===t);
   const q=wordSearchEl.value.trim().toLowerCase();
   if(q)list=list.filter(w=>(w.fr+' '+(w.senses||[]).map(s=>s.zh+' '+s.eg).join(' ')+' '+(w.note||'')).toLowerCase().includes(q));
@@ -882,8 +1018,8 @@ function renderWordsView(){
       <div class="wmain">
         <div class="wfr">${(w.type||'word')==='expr'?'💬 ':''}${esc(w.fr)}${w.pos?`<span class="wpos">${esc(w.pos)}</span>`:''}</div>
         ${(w.type||'word')==='expr'
-          ? `<div class="wzh">${(w.senses&&w.senses.length)?w.senses.map((s,j)=>`<span class="${s.b?'s-b':''} ${s.h?'s-h':''} ${s.c?'s-c':''}"><b>${esc(s.fr)||'—'}</b> → ${esc(s.zh)||'—'}</span>`).join('<br>'):'—'}</div>`
-          : `<div class="wzh">${(w.senses&&w.senses.length)?w.senses.map((s,j)=>`<span class="${s.b?'s-b':''} ${s.h?'s-h':''} ${s.c?'s-c':''}">${esc(s.zh)||'—'}</span>`).join('　'):'—'}</div>`}
+          ? `<div class="wzh">${(w.senses&&w.senses.length)?w.senses.map((s,j)=>`<span class="${s.b?'s-b':''} ${s.h?'s-h':''} ${s.c?'s-c':''}"><b>${esc(s.fr)||'—'}</b> → ${esc(s.zh)||'—'}</span>${s.eg?`<span class="weg" title="${esc(s.eg)}">例：${esc(s.eg)}</span>`:''}</span>`).join('<br>'):'—'}</div>`
+          : `<div class="wzh">${(w.senses&&w.senses.length)?w.senses.map((s,j)=>`<span class="sense"><span class="${s.b?'s-b':''} ${s.h?'s-h':''} ${s.c?'s-c':''}">${j+1}. ${esc(s.zh)||'—'}</span>${s.eg?`<span class="weg" title="${esc(s.eg)}">例：${esc(s.eg)}</span>`:''}</span>`).join('<br>'):'—'}</div>`}
         ${w.note?`<div class="wnote">📝 ${esc(w.note)}</div>`:''}
       </div>
       <div class="wops">
@@ -906,6 +1042,108 @@ document.getElementById('backShelf').onclick=showShelf;
 bookSearchEl.oninput=renderShelf;
 wordSearchEl.oninput=renderWordsView;
 document.getElementById('bookSortSel').onchange=renderWordsView;
+
+/* ---------- 常识积累 ---------- */
+let notesEditing=null;
+function branchRow(b,i){
+  return `<div class="branch" data-i="${i}">
+    <div class="brow">
+      <input type="text" class="bname" placeholder="分支名（如 名人名言 / 社会新闻 / 时尚史）" value="${esc(b.name)}">
+      <button class="fbtn" data-f="del" title="删除分支">✕</button>
+    </div>
+    <textarea class="bcontent" placeholder="在这里整理学到的常识内容…">${esc(b.content)}</textarea>
+  </div>`;
+}
+function renderBranches(){
+  const n=notesEditing;if(!n)return;
+  const el=document.getElementById('branchList');
+  el.innerHTML=n.branches.length?n.branches.map((b,i)=>branchRow(b,i).replace(/data-i="\d+"/,`data-i="${i}"`)).join('')
+    :`<div style="font-size:12px;color:var(--muted)">暂无分支，点下方添加</div>`;
+  el.querySelectorAll('.branch').forEach(br=>{
+    const i=+br.dataset.i;if(!n.branches[i])return;
+    br.querySelector('.bname').oninput=e=>n.branches[i].name=e.target.value;
+    br.querySelector('.bcontent').oninput=e=>{n.branches[i].content=e.target.value;noteStatLive();};
+    br.querySelector('[data-f=del]').onclick=()=>{n.branches.splice(i,1);renderBranches();};
+  });
+}
+function noteStatLive(){const n=notesEditing;if(!n)return;
+  const s=noteStat(n);document.getElementById('noteEditStat').textContent=`${s.c} 个分支 · ${s.k} 字`;}
+function openNoteEditor(n){
+  notesEditing=n?JSON.parse(JSON.stringify(n)):newNote();
+  document.getElementById('noteEditTitle').textContent=n?'编辑记录':'新建记录';
+  if(!n)notesEditing.branches[0].name='摘录';
+  document.getElementById('nTitle').value=notesEditing.title||'';
+  document.getElementById('nLevel').value=notesEditing.level||'B2';
+  document.getElementById('nSrc').value=notesEditing.src||'';
+  document.getElementById('nListen').checked=!!notesEditing.listen;
+  renderBranches();noteStatLive();
+  document.getElementById('noteListView').style.display='none';
+  document.getElementById('noteEditView').style.display='block';
+}
+function showNoteList(render){
+  notesEditing=null;
+  document.getElementById('noteEditView').style.display='none';
+  document.getElementById('noteListView').style.display='block';
+  if(render!==false)renderNotes();
+}
+function renderNotes(){
+  const q=(document.getElementById('noteSearch').value||'').trim().toLowerCase();
+  const lv=document.getElementById('noteLevelSel').value;
+  const sort=document.getElementById('noteSortSel').value;
+  let list=state.notes.slice();
+  if(lv==='精听')list=list.filter(n=>n.listen);
+  else if(lv!=='all')list=list.filter(n=>n.level===lv);
+  if(q)list=list.filter(n=>{
+    const hay=(n.title+' '+(n.src||'')+' '+(n.branches||[]).map(b=>b.name+' '+b.content).join(' ')).toLowerCase();
+    return hay.includes(q);});
+  if(sort==='new')list.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  if(sort==='old')list.sort((a,b)=>(a.ts||0)-(b.ts||0));
+  if(sort==='az')list.sort((a,b)=>(a.title||'未命名').localeCompare(b.title||'未命名','fr'));
+  const total=state.notes.reduce((s,n)=>s+noteStat(n).k,0);
+  document.getElementById('noteCountLabel').textContent=`共 ${state.notes.length} 条记录 · ${total} 字`;
+  const el=document.getElementById('noteList');
+  if(!list.length){el.innerHTML=`<div class="empty"><div>🗒️</div>还没有常识记录，点右上角「＋ 新建记录」开始积累</div>`;return;}
+  el.innerHTML=list.map(n=>{
+    const s=noteStat(n);
+    const bs=(n.branches||[]).slice(0,3).map(b=>`<div class="nbranch">${b.name?`<div class="nbname">${esc(b.name)}</div>`:''}<div class="nbcontent">${esc((b.content||'').slice(0,160))}${(b.content||'').length>160?'…':''}</div></div>`).join('');
+    return `<div class="ncard" data-id="${n.id}">
+      <div class="ntop"><span class="ntitle" data-op="open">${esc(n.title)||'（未命名）'}</span>
+        <span class="lv ${n.listen?'listen':''}">${esc(n.level||'B2')}${n.listen?' · 精听':''}</span></div>
+      ${n.src?`<div class="nsrc">来源：${esc(n.src)}</div>`:''}
+      ${bs}
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">${s.c} 个分支 · ${s.k} 字 · ${new Date(n.ts||Date.now()).toLocaleDateString('zh-CN')}</div>
+      <div class="nmeta"><button data-op="edit">编辑</button><button data-op="del" class="danger">删除</button></div>
+    </div>`;}).join('');
+  el.querySelectorAll('.ncard').forEach(c=>{
+    const id=c.dataset.id;
+    const open=()=>{const n=state.notes.find(x=>x.id===id);if(n)openNoteEditor(n);};
+    c.querySelector('[data-op=open]').onclick=open;
+    c.querySelector('[data-op=edit]').onclick=open;
+    c.querySelector('[data-op=del]').onclick=async()=>{
+      if(await uiConfirm('删除记录','确定删除这条常识记录？')){
+        state.notes=state.notes.filter(x=>x.id!==id);save();renderNotes();}};
+  });
+}
+document.getElementById('noteNew').onclick=()=>openNoteEditor(null);
+document.getElementById('backNotes').onclick=()=>showNoteList();
+document.getElementById('noteCancel').onclick=()=>showNoteList();
+document.getElementById('addBranch').onclick=()=>{if(notesEditing){notesEditing.branches.push({id:'b'+Date.now(),name:'',content:''});renderBranches();}};
+document.getElementById('noteSave').onclick=()=>{
+  const n=notesEditing;if(!n)return;
+  n.title=document.getElementById('nTitle').value.trim();
+  n.level=document.getElementById('nLevel').value;
+  n.src=document.getElementById('nSrc').value.trim();
+  n.listen=document.getElementById('nListen').checked;
+  n.branches=n.branches.map(b=>({id:b.id,name:(b.name||'').trim()||(b.content||'').slice(0,12)||'摘录',content:(b.content||'').trim()}))
+    .filter(b=>b.name||b.content);
+  if(!n.branches.length)n.branches=[{id:'b'+Date.now(),name:'摘录',content:''}];
+  if(!n.title)n.title=(n.branches[0]&&n.branches[0].name)||'未命名';
+  const i=state.notes.findIndex(x=>x.id===n.id);
+  if(i>=0)state.notes[i]=n;else state.notes.push(n);
+  save();showNoteList();
+};
+['noteSearch','noteLevelSel','noteSortSel'].forEach(id=>{
+  const el=document.getElementById(id);el.addEventListener(el.tagName==='INPUT'?'input':'change',renderNotes);});
 
 function render(){
   document.getElementById('countLabel').textContent=`共 ${state.words.filter(w=>w.type!=='expr').length} 词 · ${state.words.filter(w=>w.type==='expr').length} 表达 · ${state.topics.length} 个主题`;
@@ -936,7 +1174,7 @@ document.getElementById('eAddSense').onclick=()=>{editSenses.push(editType==='ex
 function renderEditRecos(){
   const fr=document.getElementById('eFr').value.trim();const box=document.getElementById('eRecos');
   const rec=recommend(fr);const all=[];[...rec,...state.topics].forEach(t=>{if(!all.includes(t))all.push(t);});
-  box.innerHTML=all.slice(0,8).map(t=>`<button class="reco ${t===editTopic?'sel':''}" data-t="${esc(t)}">${ICONS[t]||'🏷️'} ${esc(t)}</button>`).join('')
+  box.innerHTML=all.slice(0,8).map(t=>`<button class="reco ${t===editTopic?'sel':''}" data-t="${esc(t)}">${Pick(ICONS,t)}${esc(t)}</button>`).join('')
     +`<span class="createWrap" id="eCreateWrap"><button class="reco create" data-nk="open">＋ 新建主题…</button></span>`;
   box.querySelectorAll('.reco[data-t]').forEach(b=>{
     b.onclick=()=>{editTopic=b.dataset.t;renderEditRecos();};
@@ -980,7 +1218,7 @@ document.getElementById('exportBtn').onclick=()=>{
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carnet_法语生词本.json';a.click();};
 document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
 document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=()=>{try{const d=JSON.parse(r.result);if(d.words){state=d;state.topics=state.topics||DEFAULT_TOPICS;state.order=state.order||{};state.topics.forEach(syncOrder);save();render();uiAlert('导入成功','单词已导入');}}catch(err){uiAlert('导入失败','文件格式错误');}};r.readAsText(f);};
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(d.words){state=d;state.topics=state.topics||DEFAULT_TOPICS;state.order=state.order||{};state.notes=state.notes||[];state.topics.forEach(syncOrder);save();render();uiAlert('导入成功','单词与常识记录已导入');}}catch(err){uiAlert('导入失败','文件格式错误');}};r.readAsText(f);};
 
 /* ---------- 自动保存保障 ---------- */
 window.addEventListener('beforeunload',()=>{try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}});
