@@ -490,9 +490,14 @@
   .lv{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--brand-soft);color:var(--brand)}
   .lv.listen{background:#ede7fb;color:#6d3bb8}
   .ncard .nsrc{font-size:12px;color:var(--muted);margin-top:4px}
-  .ncard .nbranch{border-left:3px solid var(--brand-soft);padding:2px 0 2px 10px;margin:8px 0 0}
-  .ncard .nbname{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:2px}
-  .ncard .nbcontent{font-size:13px;color:#5b5470;white-space:pre-wrap;line-height:1.7}
+  .ncard .nbranch{border:1px solid var(--line);border-radius:10px;margin:8px 0 0;overflow:hidden;background:var(--bg)}
+  .ncard .nbhead{display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 10px;user-select:none;list-style:none}
+  .ncard .nbhead::-webkit-details-marker{display:none}
+  .ncard .nbhead .caret{font-size:10px;color:var(--brand);transition:transform .15s;display:inline-block}
+  .ncard .nbranch[open] .nbhead .caret{transform:rotate(90deg)}
+  .ncard .nbhead .nbname{font-size:12px;font-weight:700;color:var(--brand);flex:1}
+  .ncard .nbhead .nbprev{font-size:11px;color:var(--muted);max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ncard .nbcontent{font-size:13px;color:#5b5470;white-space:pre-wrap;line-height:1.7;padding:0 10px 10px;border-left:3px solid var(--brand-soft);margin:0 10px 8px}
   .ncard .nmeta{margin-top:10px;display:flex;justify-content:flex-end;gap:8px}
   .ncard .nmeta button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;color:#6f6990}
   .ncard .nmeta button.danger{color:#c0392b}
@@ -1105,7 +1110,7 @@ function renderNotes(){
   if(!list.length){el.innerHTML=`<div class="empty"><div>🗒️</div>还没有常识记录，点右上角「＋ 新建记录」开始积累</div>`;return;}
   el.innerHTML=list.map(n=>{
     const s=noteStat(n);
-    const bs=(n.branches||[]).slice(0,3).map(b=>`<div class="nbranch">${b.name?`<div class="nbname">${esc(b.name)}</div>`:''}<div class="nbcontent">${esc((b.content||'').slice(0,160))}${(b.content||'').length>160?'…':''}</div></div>`).join('');
+    const bs=(n.branches||[]).map(b=>{const txt=(b.content||'').trim();const prev=txt.replace(/\s+/g,' ').slice(0,24);return `<details class="nbranch"><summary class="nbhead"><span class="caret">▶</span><span class="nbname">${esc(b.name||'摘录')}</span>${txt?`<span class="nbprev">${esc(prev)}</span>`:''}</summary>${txt?`<div class="nbcontent">${esc(txt)}</div>`:`<div class="nbcontent" style="color:var(--muted)">（暂无内容）</div>`}</details>`;}).join('');
     return `<div class="ncard" data-id="${n.id}">
       <div class="ntop"><span class="ntitle" data-op="open">${esc(n.title)||'（未命名）'}</span>
         <span class="lv ${n.listen?'listen':''}">${esc(n.level||'B2')}${n.listen?' · 精听':''}</span></div>
